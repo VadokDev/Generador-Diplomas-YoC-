@@ -1,5 +1,8 @@
 diplomas/
 data.js
+certificates.js
+students.js
+config.js
 
 # Logs
 logs
@@ -117,3 +120,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+templates/*
+!templates/example.pdf
