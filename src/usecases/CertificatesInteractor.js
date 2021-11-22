@@ -1,9 +1,11 @@
+import path from "path";
 import Certificate from "../entities/Certificate.js";
 import Student from "../entities/Student.js";
+import Tutor from "../entities/Tutor.js";
 
 export default class CertificatesInteractor {
-  constructor(pdfService) {
-    this.pdfService = pdfService;
+  constructor(certificateService) {
+    this.certificateService = certificateService;
   }
 
   processCertificates(certificatesData) {
@@ -11,7 +13,7 @@ export default class CertificatesInteractor {
       (res, cert) => ({
         ...res,
         [cert.course]: new Certificate(
-          cert.templateName,
+          cert.templates,
           cert.fontSize,
           cert.fontName,
           cert.textPosY,
@@ -32,31 +34,57 @@ export default class CertificatesInteractor {
     );
   }
 
-  generateCertificate(student, certificate) {
-    this.pdfService
+  processTutors(tutorsData) {
+    return tutorsData.reduce(
+      (res, tutor) => [
+        ...res,
+        new Tutor(tutor.name, tutor.email, tutor.course, tutor.section),
+      ],
+      []
+    );
+  }
+
+  generateCertificate(user, certificate, type) {
+    this.certificateService
       .init(
-        certificate.templateName,
+        certificate.getTemplateName(type),
         certificate.fontName,
         certificate.fontSize,
         certificate.hMargin
       )
       .then(() => {
-        this.pdfService.writeInCertificate(
-          student.getNameForCertificate(),
+        this.certificateService.writeInCertificate(
+          user.getNameForCertificate(),
           certificate.textPosY
         );
-        this.pdfService.saveCertificate(
-          "2021-01",
-          student.course,
-          student.section,
-          student.getNameForFile()
+        this.certificateService.saveCertificate(
+          user.getCertificatePath(path, "2021-01")
         );
       });
   }
 
-  generateAllCertificates(students, certificates) {
-    students.forEach((student) =>
-      this.generateCertificate(student, certificates[student.course])
+  generateAllCertificates(users, certificates, type) {
+    const promises = users.reduce((res, user) =>
+      [this.generateCertificate(user, certificates[user.course], type), ...res], []
     );
+
+    return Promise.all(promises);
+  }
+
+  async sendCertificatesByEmail(users) {
+    let i = 0;
+    const promises = users.reduce((res, user) => [
+      ...res,
+      new Promise((resolve) => {
+        setTimeout(() => {
+          this.certificateService.sendCertificateByEmail(
+            user.email,
+            user.emailText(),
+            user.getCertificatePath(path, "2021-01")
+          ).then(resolve);
+          console.log("Hola", user.email);
+        }, i+=15345);
+      })], []);
+    return Promise.all(promises);
   }
 }

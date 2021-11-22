@@ -32,9 +32,8 @@ export default class Student {
   }
 
   emailText() {
-    const mensaje = `Hola ${
-      this.name.split(" ")[0]
-    }!<br></br>A nombre del equipo de coordinación de los <b>Talleres OCI Labs</b>, me alegra mucho entregarte este <b>Diploma de Participación</b> por completar el <b>${this.getCourseName()}</b>, que comprendió un total de 30hrs en modalidad no presencial.<br></br>Te invitamos a seguir participando de instancias donde puedas aprender más sobre programación y el mundo de la informática.<br>¡Nos vemos pronto! 😄`;
+    const mensaje = `Hola ${this.name.split(' ')[0]}!<br></br>A nombre del equipo de coordinación de los <b>Talleres OCI Labs</b>, me alegra mucho entregarte este <b>Diploma de Participación</b> por formar parte del <b>Equipo de Tutores</b> del <b>${this.getCourseName()}</b>, que comprendió un total de 12 sesiones modalidad no presencial.<br></br>Sin tu esfuerzo y dedicación no habría sido posible llevar a cabo esta gran labor.<br>¡Muchas gracias! 😄`;
+
     return mensaje;
   }
 }

@@ -8,7 +8,7 @@
 	yarn install
 ```
 
-2. Renombrar el archivo ```data.example.js``` a ```data.js``` e ingresar en él los nombres de los estudiantes según taller y paralelo.
+2. Renombrar el archivo ```students.example.js``` a ```students.js``` e ingresar en él los nombres de los estudiantes según taller y paralelo.
 
 ```Javascript
 'basico': {
@@ -48,6 +48,5 @@ yarn start
 ### Otros
 
 1. Se pueden modificar los templates editando los pdfs de la carpeta ```templates```
-2. Se pueden generar diplomas de competencia descomentando la línea 109 de ```index.js``` e indicando el taller correspondiente.
 3. Si se agregan más talleres, se debe agregar el template correspondiente, manteniendo la relación de nombre
 4. La tipografía de los nombres es **LibreBaskerville-Bold** y puede cambiarse en la línea 102 de ```index.js```, además, se debe dejar la tipografía en la carpeta ```fonts```

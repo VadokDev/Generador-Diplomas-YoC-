@@ -1,9 +1,13 @@
 export default class Certificate {
-  constructor(templateName, fontSize, fontName, textPosY, hMargin) {
-    this.templateName = templateName;
+  constructor(templates, fontSize, fontName, textPosY, hMargin) {
+    this.templates = templates;
     this.fontSize = fontSize;
     this.fontName = fontName;
     this.textPosY = textPosY;
     this.hMargin = hMargin;
+  }
+
+  getTemplateName(type) {
+    return this.templates[type] ?? 'example';
   }
 }

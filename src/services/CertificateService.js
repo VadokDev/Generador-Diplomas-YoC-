@@ -3,9 +3,13 @@ import fsPath from "fs-path";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import nodemailer from 'nodemailer';
 
-export default class PdfService {
-  constructor() {}
+export default class CertificateService {
+  constructor(emailConfig) {
+    this.emailConfig = emailConfig;
+    this.transporter = nodemailer.createTransport(this.emailConfig);
+  }
 
   async init(templateName, fontName, textSize = 35, marginHorizontal = 20) {
     this.templateName = templateName;
@@ -24,7 +28,7 @@ export default class PdfService {
   async loadTemplateFile() {
     const templateBytes = fs.readFileSync(`templates/${this.templateName}.pdf`);
     return PDFDocument.load(templateBytes).catch((error) => {
-      console.log("[PdfService] error reading template file");
+      console.log("[CertificateService] error reading template file");
       throw new Error(error);
     });
   }
@@ -37,7 +41,7 @@ export default class PdfService {
       .embedFont(fontBytes)
       .then((font) => [pdfDoc, font])
       .catch((error) => {
-        console.log("[PdfService] error reading font file");
+        console.log("[CertificateService] error reading font file");
         throw new Error(error);
       });
   }
@@ -55,17 +59,17 @@ export default class PdfService {
     });
   }
 
-  async saveCertificate(semester, course, section, fileName) {
+  async saveCertificate(filePath) {
     return this.pdfDoc
       .save()
       .then((pdfBytes) => {
         fsPath.writeFileSync(
-          path.join("diplomas", semester, course, section, `${fileName}.pdf`),
+          filePath,
           pdfBytes
         );
       })
       .catch((error) => {
-        console.log("[PdfService] error storing the certificate");
+        console.log("[CertificateService] error storing the certificate");
         throw new Error(error);
       });
   }
@@ -77,10 +81,34 @@ export default class PdfService {
     while (textWidth > pageWidth - this.marginHorizontal) {
       this.textSize--;
       textWidth = this.font.widthOfTextAtSize(text, this.textSize);
-
-      console.log("Achicando el texto:", text);
     }
 
     return textWidth;
+  }
+
+  async sendCertificateByEmail(email, emailText, certificatePath) {
+    const mailOptions = {
+        from: this.emailConfig.fromEmail,
+        to: email,
+        subject: this.emailConfig.subjectText,
+        html: emailText,
+        attachments: [
+          {
+              filename: 'diploma.pdf',
+              path: certificatePath,
+          },
+        ],
+    };
+    
+    return new Promise((resolve, reject) => this.transporter.sendMail(mailOptions, function (err, info) {
+        if (err) { 
+          console.log(err);
+          setTimeout(reject, 7500);
+        }
+        else {
+          console.log(info);
+          setTimeout(resolve, 7500);
+        }
+    }));
   }
 }
